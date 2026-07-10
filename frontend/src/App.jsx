@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './App.css';
 
 const GRAPHQL_URL = 'http://localhost:8000/graphql';
 
@@ -59,64 +60,90 @@ function App() {
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: '600px' }}>
-      <h1>Book & Movie Summarizer</h1>
+    <div className="app-shell">
+      <div className="app-card">
+        <header className="hero-panel">
+          <div className="hero-badge">AI Summary Studio</div>
+          <h1 className="hero-title">Book & Movie Summarizer</h1>
+          <p className="hero-copy">
+            Enter a title, choose your spoiler and length preference, then let the AI unfold the story in
+            a beautifully crafted summary.
+          </p>
+        </header>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
-        <label>
-          Title:{' '}
-          <input value={title} onChange={(e) => setTitle(e.target.value)} style={{ width: '250px' }} />
-        </label>
+        <section className="controls-panel">
+          <div className="field-group">
+            <label htmlFor="title">Title</label>
+            <input
+              id="title"
+              type="text"
+              placeholder="Enter book or movie title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
 
-        <label>
-          Media type:{' '}
-          <select value={mediaType} onChange={(e) => setMediaType(e.target.value)}>
-            <option value="book">Book</option>
-            <option value="movie">Movie</option>
-          </select>
-        </label>
+          <div className="field-group">
+            <label htmlFor="mediaType">Media type</label>
+            <select id="mediaType" value={mediaType} onChange={(e) => setMediaType(e.target.value)}>
+              <option value="book">Book</option>
+              <option value="movie">Movie</option>
+            </select>
+          </div>
 
-        <label>
-          Spoiler level:{' '}
-          <select value={spoilerLevel} onChange={(e) => setSpoilerLevel(e.target.value)}>
-            <option value="none">None</option>
-            <option value="mild">Mild</option>
-            <option value="full">Full</option>
-          </select>
-        </label>
+          <div className="field-group">
+            <label htmlFor="spoilerLevel">Spoiler level</label>
+            <select id="spoilerLevel" value={spoilerLevel} onChange={(e) => setSpoilerLevel(e.target.value)}>
+              <option value="none">None</option>
+              <option value="mild">Mild</option>
+              <option value="full">Full</option>
+            </select>
+          </div>
 
-        <label>
-          Length:{' '}
-          <select value={length} onChange={(e) => setLength(e.target.value)}>
-            <option value="short">Short</option>
-            <option value="medium">Medium</option>
-            <option value="long">Long</option>
-          </select>
-        </label>
-      </div>
+          <div className="field-group">
+            <label htmlFor="length">Length</label>
+            <select id="length" value={length} onChange={(e) => setLength(e.target.value)}>
+              <option value="short">Short</option>
+              <option value="medium">Medium</option>
+              <option value="long">Long</option>
+            </select>
+          </div>
 
-      <button onClick={handleGenerate} disabled={loading || !title}>
-        {loading ? 'Generating...' : 'Generate Summary'}
-      </button>
+          <button className="primary-button" onClick={handleGenerate} disabled={loading || !title}>
+            {loading ? 'Generating summary…' : 'Generate Summary'}
+          </button>
 
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      {notFound && <p style={{ color: '#b45309' }}>No match found for "{title}" as a {mediaType}.</p>}
+          {error && <p className="status-message status-error">Error: {error}</p>}
+          {notFound && <p className="status-message status-warning">No match found for “{title}” as a {mediaType}.</p>}
+        </section>
 
-      {result && (
-        <div style={{ marginTop: '1.5rem' }}>
-          {result.confidence === 'low' && (
-            <div style={{ color: '#b45309', background: '#fef3c7', padding: '0.5rem', borderRadius: '4px', marginBottom: '1rem' }}>
-              ⚠️ Low confidence — this may not be accurate or the title may be ambiguous.
+        {result && (
+          <section className="result-panel">
+            {result.confidence === 'low' && (
+              <div className="confidence-banner">
+                ⚠️ Low confidence — the title may be ambiguous or the summary may need extra verification.
+              </div>
+            )}
+
+            <div className="result-header">
+              <div>
+                <p className="result-meta">{mediaType.toUpperCase()} SUMMARY</p>
+                <h2>{result.title}</h2>
+              </div>
+              <div className="result-tags">
+                <span>{result.genre.join(', ')}</span>
+                <span>{result.themes.join(', ')}</span>
+              </div>
             </div>
-          )}
-          <h2>{result.title}</h2>
-          <p><strong>Genre:</strong> {result.genre.join(', ')}</p>
-          <p><strong>Themes:</strong> {result.themes.join(', ')}</p>
-          {result.summary.split('\n\n').map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
-        </div>
-      )}
+
+            <div className="summary-content">
+              {result.summary.split('\n\n').map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }
